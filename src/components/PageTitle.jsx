@@ -10,7 +10,7 @@ export default function PageTitle() {
         let title = "";
 
         // Base title based on language
-        const appName = i18n.language === "km" ? "សារភាពស្នេហ៍" : "Love Confession";
+        const appName = "Confession";
 
         switch (pathname) {
             case "/":
