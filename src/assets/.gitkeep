@@ -1,0 +1,7 @@
+# Place your images here:
+# - kosal.jpg (or .png, .webp)
+# - mengly.jpg (or .png, .webp)
+#
+# After uploading, update the imports in src/components/LovePairHero.jsx:
+# import kosalImg from "../assets/kosal.jpg";
+# import menglyImg from "../assets/mengly.jpg";
