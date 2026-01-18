@@ -36,6 +36,10 @@ A beautiful and interactive love confession application built with React, Tailwi
 
 Start the development server:
 
+```bash
+npm run dev
+```
+
 ## 🚀 Deployment
 
 ### Option A: Vercel (Recommended)
@@ -57,10 +61,6 @@ Start the development server:
    npm run deploy
    ```
    This will build and push to `gh-pages` branch.
-
-```bash
-npm run dev
-```
 
 ### Build
 
