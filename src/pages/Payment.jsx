@@ -32,6 +32,7 @@ export default function Payment() {
 
     // Mock KHQR String (In real app, fetch from Backend)
     // This is a dummy KHQR for display purposes
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     const mockKHQR = useMemo(() => `00020101021229370016000201010211520460115802KH5913LOVE_CONFESSION6004PHNOM_PENH62270114${invoiceId}63041234`, [invoiceId]);
 
     useEffect(() => {
