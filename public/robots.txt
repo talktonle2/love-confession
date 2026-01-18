@@ -1,4 +1,4 @@
 User-agent: *
 Allow: /
 
-Sitemap: https://love-confession.com/sitemap.xml
+Sitemap: https://talktonle2.github.io/love-confession/sitemap.xml
