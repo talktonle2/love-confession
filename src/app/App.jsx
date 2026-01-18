@@ -23,6 +23,8 @@ import Community from "../pages/Community.jsx";
 import Security from "../pages/Security.jsx";
 import Privacy from "../pages/Privacy.jsx";
 import PageTitle from "../components/PageTitle.jsx";
+import Login from "../pages/Login.jsx";
+import Register from "../pages/Register.jsx";
 import ScrollToTop from "../components/ScrollToTop.jsx";
 import ErrorBoundary from "../components/ErrorBoundary.jsx";
 
@@ -57,6 +59,8 @@ export default function App() {
           <Route path="/who-liked-you" element={<WhoLikedYou />} />
           <Route path="/coins" element={<Coins />} />
           <Route path="/creator/:id" element={<CreatorProfile />} />
+          <Route path="/login" element={<Login />} />
+          <Route path="/register" element={<Register />} />
           <Route path="*" element={<NotFound />} />
         </Routes>
       </div>
