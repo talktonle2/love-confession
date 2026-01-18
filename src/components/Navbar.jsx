@@ -1,6 +1,7 @@
 import { useState, useEffect, useCallback } from "react";
-import { Link, NavLink, useNavigate } from "react-router-dom";
-import { PenLine, Heart, Moon, Sun, Crown, MessageCircle, UserPlus, Home, Rss, Star, BarChart3, Eye, Sparkles, Menu, X, Search, Bell, User, Settings, LogOut } from "lucide-react";
+import { Link, useNavigate, NavLink } from "react-router-dom";
+import { Heart, Home, UserPlus, MessageCircle, PenLine, Rss, Star, BarChart3, Eye, Search, Bell, User, Settings, Sun, Moon, LogOut, Menu, X, Sparkles, Crown } from "lucide-react";
+import { useAuth } from "../hooks/useAuth";
 import { useTranslation } from "react-i18next";
 import { useTheme } from "../hooks/useTheme";
 import { useSubscription } from "../hooks/useSubscription.js";
@@ -23,6 +24,7 @@ export default function Navbar() {
   const { t, i18n } = useTranslation();
   const navigate = useNavigate();
   const { theme, setTheme } = useTheme();
+  const { user, isAuthenticated, logout } = useAuth();
   const { isPro, canSeeWhoLikedYou, isDarkModeAllowed } = useSubscription();
   const { coins } = useCoins();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
@@ -108,7 +110,7 @@ export default function Navbar() {
     const handleSwipeGesture = () => {
       const swipeThreshold = 50;
       const diff = touchStartX - touchEndX;
-      
+
       // Swipe right to open menu (from left edge)
       if (diff < -swipeThreshold && touchStartX < 50) {
         setIsMobileMenuOpen(true);
@@ -210,77 +212,94 @@ export default function Navbar() {
                 )}
               </button>
 
-              {/* Profile Dropdown */}
-              <div className="relative">
-                <button
-                  onClick={toggleProfile}
-                  className="p-2 rounded-xl hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors focus:outline-none focus:ring-2 focus:ring-pink-500 focus:ring-offset-2"
-                  title="Profile"
-                  aria-label="Profile menu"
-                  aria-expanded={isProfileOpen}
-                  aria-haspopup="true"
+              {/* Profile Dropdown or Login Button */}
+              {isAuthenticated ? (
+                <div className="relative">
+                  <button
+                    onClick={toggleProfile}
+                    className="p-2 rounded-xl hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors focus:outline-none focus:ring-2 focus:ring-pink-500 focus:ring-offset-2 flex items-center gap-2"
+                    title="Profile"
+                    aria-label="Profile menu"
+                    aria-expanded={isProfileOpen}
+                    aria-haspopup="true"
+                  >
+                    {user?.avatar ? (
+                      <img src={user.avatar} alt={user.name} className="w-5 h-5 rounded-full object-cover" />
+                    ) : (
+                      <User className="h-4 w-4" />
+                    )}
+                  </button>
+
+                  <AnimatePresence>
+                    {isProfileOpen && (
+                      <motion.div
+                        initial={{ opacity: 0, y: -10, scale: 0.95 }}
+                        animate={{ opacity: 1, y: 0, scale: 1 }}
+                        exit={{ opacity: 0, y: -10, scale: 0.95 }}
+                        transition={{ duration: 0.2 }}
+                        className="absolute right-0 mt-2 w-48 bg-white dark:bg-slate-900 rounded-xl border dark:border-slate-800 shadow-lg z-50"
+                      >
+                        <div className="p-2">
+                          <div className="px-3 py-2 border-b dark:border-slate-800 mb-2">
+                            <p className="font-bold text-sm truncate dark:text-white">{user?.name}</p>
+                            <p className="text-xs text-slate-500 truncate">{user?.email}</p>
+                          </div>
+                          <Link
+                            to="/profile"
+                            className="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
+                            onClick={() => setIsProfileOpen(false)}
+                          >
+                            <User className="h-4 w-4" />
+                            <span className="text-sm">Profile</span>
+                          </Link>
+                          <Link
+                            to="/settings"
+                            className="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
+                            onClick={() => setIsProfileOpen(false)}
+                          >
+                            <Settings className="h-4 w-4" />
+                            <span className="text-sm">Settings</span>
+                          </Link>
+                          <button
+                            className="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors w-full text-left"
+                            onClick={() => {
+                              // Cycle through themes
+                              const themes = ['light', 'dark', 'auto'];
+                              const currentIndex = themes.indexOf(theme);
+                              const nextIndex = (currentIndex + 1) % themes.length;
+                              setTheme(themes[nextIndex]);
+                              setIsProfileOpen(false);
+                            }}
+                          >
+                            {theme === 'light' && <Sun className="h-4 w-4" />}
+                            {theme === 'dark' && <Moon className="h-4 w-4" />}
+                            {theme === 'auto' && <Settings className="h-4 w-4" />}
+                            <span className="text-sm">Theme: {theme.charAt(0).toUpperCase() + theme.slice(1)}</span>
+                          </button>
+                          <hr className="my-2 dark:border-slate-700" />
+                          <button
+                            className="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors w-full text-left text-red-600 dark:text-red-400"
+                            onClick={() => {
+                              logout();
+                              setIsProfileOpen(false);
+                            }}
+                          >
+                            <LogOut className="h-4 w-4" />
+                            <span className="text-sm">Logout</span>
+                          </button>
+                        </div>
+                      </motion.div>
+                    )}
+                  </AnimatePresence>
+                </div>
+              ) : (
+                <Link
+                  to="/login"
+                  className="px-4 py-2 rounded-xl bg-slate-900 text-white text-sm font-bold hover:bg-slate-800 transition dark:bg-white dark:text-slate-900 dark:hover:bg-slate-200"
                 >
-                  <User className="h-4 w-4" />
-                </button>
-                
-                <AnimatePresence>
-                  {isProfileOpen && (
-                    <motion.div
-                      initial={{ opacity: 0, y: -10, scale: 0.95 }}
-                      animate={{ opacity: 1, y: 0, scale: 1 }}
-                      exit={{ opacity: 0, y: -10, scale: 0.95 }}
-                      transition={{ duration: 0.2 }}
-                      className="absolute right-0 mt-2 w-48 bg-white dark:bg-slate-900 rounded-xl border dark:border-slate-800 shadow-lg z-50"
-                    >
-                      <div className="p-2">
-                        <Link
-                          to="/profile"
-                          className="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
-                          onClick={() => setIsProfileOpen(false)}
-                        >
-                          <User className="h-4 w-4" />
-                          <span className="text-sm">Profile</span>
-                        </Link>
-                        <Link
-                          to="/settings"
-                          className="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
-                          onClick={() => setIsProfileOpen(false)}
-                        >
-                          <Settings className="h-4 w-4" />
-                          <span className="text-sm">Settings</span>
-                        </Link>
-                        <button
-                          className="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors w-full text-left"
-                          onClick={() => {
-                            // Cycle through themes
-                            const themes = ['light', 'dark', 'auto'];
-                            const currentIndex = themes.indexOf(theme);
-                            const nextIndex = (currentIndex + 1) % themes.length;
-                            setTheme(themes[nextIndex]);
-                            setIsProfileOpen(false);
-                          }}
-                        >
-                          {theme === 'light' && <Sun className="h-4 w-4" />}
-                          {theme === 'dark' && <Moon className="h-4 w-4" />}
-                          {theme === 'auto' && <Settings className="h-4 w-4" />}
-                          <span className="text-sm">Theme: {theme.charAt(0).toUpperCase() + theme.slice(1)}</span>
-                        </button>
-                        <hr className="my-2 dark:border-slate-700" />
-                        <button
-                          className="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors w-full text-left"
-                          onClick={() => {
-                            // Handle logout
-                            setIsProfileOpen(false);
-                          }}
-                        >
-                          <LogOut className="h-4 w-4" />
-                          <span className="text-sm">Logout</span>
-                        </button>
-                      </div>
-                    </motion.div>
-                  )}
-                </AnimatePresence>
-              </div>
+                  Login
+                </Link>
+              )}
 
               <Link
                 to="/coins"

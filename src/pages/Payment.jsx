@@ -1,6 +1,6 @@
-/* eslint-disable react-hooks/exhaustive-deps */
+
 import { useParams, useNavigate } from "react-router-dom";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import Container from "../components/Container.jsx";
 import { Check, RefreshCw, Coffee } from "lucide-react";
 import { useTranslation } from "react-i18next";
@@ -28,11 +28,11 @@ export default function Payment() {
     const [coinPackage, setCoinPackage] = useState(null);
     const [coffeeOrder, setCoffeeOrder] = useState(null);
 
-    const invoiceId = `INV-${Date.now()}`;
+    const invoiceId = useMemo(() => `INV-${Date.now()}`, []);
 
     // Mock KHQR String (In real app, fetch from Backend)
     // This is a dummy KHQR for display purposes
-    const mockKHQR = `00020101021229370016000201010211520460115802KH5913LOVE_CONFESSION6004PHNOM_PENH62270114${invoiceId}63041234`;
+    const mockKHQR = useMemo(() => `00020101021229370016000201010211520460115802KH5913LOVE_CONFESSION6004PHNOM_PENH62270114${invoiceId}63041234`, [invoiceId]);
 
     useEffect(() => {
         // Load package/order data
@@ -60,7 +60,7 @@ export default function Payment() {
             setQr(mockKHQR);
             setLoading(false);
         }, 1000);
-    }, [planId, isCoinPurchase, isCoffeePurchase, coinPackageId, coffeeOrderId, navigate]);
+    }, [planId, isCoinPurchase, isCoffeePurchase, coinPackageId, coffeeOrderId, navigate, mockKHQR]);
 
     const handlePaymentSuccess = () => {
         setLoading(true);

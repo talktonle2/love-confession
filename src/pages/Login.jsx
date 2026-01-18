@@ -1,5 +1,6 @@
 import { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
+import { useAuth } from "../hooks/useAuth";
 import { motion } from "framer-motion";
 import { Heart, Mail, Lock, ArrowRight, Github, Facebook } from "lucide-react";
 import Container from "../components/Container";
@@ -7,11 +8,29 @@ import Container from "../components/Container";
 export default function Login() {
     const [loading, setLoading] = useState(false);
 
-    const handleSubmit = (e) => {
+    const { login } = useAuth();
+    const navigate = useNavigate();
+
+    const handleSubmit = async (e) => {
         e.preventDefault();
         setLoading(true);
-        // Simulate login
-        setTimeout(() => setLoading(false), 2000);
+        try {
+            await login("test@example.com", "password"); // In a real form, gather these from state/refs. 
+            // Wait, the form inputs are uncontrolled or not bound to state in the original file? 
+            // Let's check line 44/59. They are uncontrolled. We need to get values.
+            // Let's refactor to get values from form.
+            const formData = new FormData(e.target);
+            const email = formData.get("email");
+            const password = formData.get("password");
+
+            await login(email, password);
+            navigate("/"); // Redirect to home or dashboard
+        } catch (error) {
+            console.error("Login failed:", error);
+            // Optionally set error state here
+        } finally {
+            setLoading(false);
+        }
     };
 
     return (
@@ -43,6 +62,7 @@ export default function Login() {
                             <div className="relative">
                                 <input
                                     type="email"
+                                    name="email"
                                     required
                                     className="w-full px-4 py-3 pl-11 rounded-xl border border-slate-200 dark:border-slate-700 bg-white/50 dark:bg-slate-800/50 focus:ring-2 focus:ring-pink-500 focus:border-transparent transition-all outline-none dark:text-white"
                                     placeholder="name@example.com"
@@ -58,6 +78,7 @@ export default function Login() {
                             <div className="relative">
                                 <input
                                     type="password"
+                                    name="password"
                                     required
                                     className="w-full px-4 py-3 pl-11 rounded-xl border border-slate-200 dark:border-slate-700 bg-white/50 dark:bg-slate-800/50 focus:ring-2 focus:ring-pink-500 focus:border-transparent transition-all outline-none dark:text-white"
                                     placeholder="••••••••"

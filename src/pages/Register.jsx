@@ -1,5 +1,6 @@
 import { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
+import { useAuth } from "../hooks/useAuth";
 import { motion } from "framer-motion";
 import { Heart, Mail, Lock, User, ArrowRight } from "lucide-react";
 import Container from "../components/Container";
@@ -7,11 +8,25 @@ import Container from "../components/Container";
 export default function Register() {
     const [loading, setLoading] = useState(false);
 
-    const handleSubmit = (e) => {
+    const { register } = useAuth();
+    const navigate = useNavigate();
+
+    const handleSubmit = async (e) => {
         e.preventDefault();
         setLoading(true);
-        // Simulate register
-        setTimeout(() => setLoading(false), 2000);
+        try {
+            const formData = new FormData(e.target);
+            const name = formData.get("name");
+            const email = formData.get("email");
+            const password = formData.get("password");
+
+            await register(name, email, password);
+            navigate("/");
+        } catch (error) {
+            console.error("Register failed", error);
+        } finally {
+            setLoading(false);
+        }
     };
 
     return (
@@ -40,6 +55,7 @@ export default function Register() {
                             <div className="relative">
                                 <input
                                     type="text"
+                                    name="name"
                                     required
                                     className="w-full px-4 py-3 pl-11 rounded-xl border border-slate-200 dark:border-slate-700 bg-white/50 dark:bg-slate-800/50 focus:ring-2 focus:ring-pink-500 focus:border-transparent transition-all outline-none dark:text-white"
                                     placeholder="John Doe"
@@ -55,6 +71,7 @@ export default function Register() {
                             <div className="relative">
                                 <input
                                     type="email"
+                                    name="email"
                                     required
                                     className="w-full px-4 py-3 pl-11 rounded-xl border border-slate-200 dark:border-slate-700 bg-white/50 dark:bg-slate-800/50 focus:ring-2 focus:ring-pink-500 focus:border-transparent transition-all outline-none dark:text-white"
                                     placeholder="name@example.com"
@@ -70,6 +87,7 @@ export default function Register() {
                             <div className="relative">
                                 <input
                                     type="password"
+                                    name="password"
                                     required
                                     className="w-full px-4 py-3 pl-11 rounded-xl border border-slate-200 dark:border-slate-700 bg-white/50 dark:bg-slate-800/50 focus:ring-2 focus:ring-pink-500 focus:border-transparent transition-all outline-none dark:text-white"
                                     placeholder="Create a password"

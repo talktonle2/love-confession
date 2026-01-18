@@ -1,6 +1,8 @@
-import { useState } from "react";
+
+import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import { User, Heart, MessageCircle, Settings, Camera, Edit2, Star, Calendar, MapPin, Link as LinkIcon, Shield, Crown, Sparkles } from "lucide-react";
+import { useAuth } from "../hooks/useAuth";
 import { useSubscription } from "../hooks/useSubscription.js";
 import { useCoins } from "../hooks/useCoins.js";
 import { Link } from "react-router-dom";
@@ -8,6 +10,7 @@ import { Link } from "react-router-dom";
 export default function Profile() {
   const { isPro } = useSubscription();
   const { coins } = useCoins();
+  const { user, updateProfile } = useAuth();
   const [isEditing, setIsEditing] = useState(false);
   const [userStats] = useState({
     confessions: 42,
@@ -16,24 +19,56 @@ export default function Profile() {
     shares: 89
   });
 
-  const [profileData, setProfileData] = useState({
-    name: "Love User",
-    bio: "Sharing love and confessions anonymously 💕",
-    location: "Phnom Penh, Cambodia",
-    website: "loveconfession.app",
-    joinDate: "January 2024",
+  const [editForm, setEditForm] = useState({
+    name: "",
+    bio: "",
+    location: "",
+    website: "",
+    joinDate: "",
     avatar: null
   });
 
-  const [editForm, setEditForm] = useState({ ...profileData });
+  // Sync editForm with user data when user loads
+  useEffect(() => {
+    if (user && !isEditing) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
+      setEditForm(prev => {
+        // Only update if data actually changed significantly
+        if (prev.name === user.name &&
+          prev.bio === user.bio &&
+          prev.location === user.location &&
+          prev.website === user.website &&
+          prev.avatar === user.avatar) {
+          return prev;
+        }
+        return {
+          name: user.name || "Love User",
+          bio: user.bio || "Sharing love and confessions anonymously 💕",
+          location: user.location || "Phnom Penh, Cambodia",
+          website: user.website || "loveconfession.app",
+          joinDate: user.joinDate || "January 2024",
+          avatar: user.avatar || null
+        };
+      });
+    }
+  }, [user, isEditing]);
 
   const handleSaveProfile = () => {
-    setProfileData({ ...editForm });
+    updateProfile(editForm);
     setIsEditing(false);
   };
 
   const handleCancelEdit = () => {
-    setEditForm({ ...profileData });
+    if (user) {
+      setEditForm({
+        name: user.name || "Love User",
+        bio: user.bio || "",
+        location: user.location || "",
+        website: user.website || "",
+        joinDate: user.joinDate || "",
+        avatar: user.avatar || null
+      });
+    }
     setIsEditing(false);
   };
 
@@ -50,8 +85,8 @@ export default function Profile() {
           <div className="relative">
             <div className="w-32 h-32 rounded-full bg-gradient-to-br from-pink-400 to-purple-400 p-1">
               <div className="w-full h-full rounded-full bg-white dark:bg-slate-900 flex items-center justify-center">
-                {profileData.avatar ? (
-                  <img src={profileData.avatar} alt="Profile" className="w-full h-full rounded-full object-cover" />
+                {editForm.avatar ? (
+                  <img src={editForm.avatar} alt="Profile" className="w-full h-full rounded-full object-cover" />
                 ) : (
                   <User className="w-16 h-16 text-pink-500" />
                 )}
@@ -76,7 +111,7 @@ export default function Profile() {
                     className="px-3 py-1 rounded-lg border bg-white dark:bg-slate-700 dark:border-slate-600 dark:text-white focus:outline-none focus:ring-2 focus:ring-pink-500"
                   />
                 ) : (
-                  profileData.name
+                  editForm.name
                 )}
               </h1>
               {isPro && (
@@ -98,12 +133,12 @@ export default function Profile() {
                     className="px-2 py-1 rounded border bg-white dark:bg-slate-700 dark:border-slate-600 dark:text-white focus:outline-none focus:ring-2 focus:ring-pink-500"
                   />
                 ) : (
-                  profileData.location
+                  editForm.location
                 )}
               </div>
               <div className="flex items-center gap-1">
                 <Calendar className="w-4 h-4" />
-                Joined {profileData.joinDate}
+                Joined {editForm.joinDate}
               </div>
             </div>
 
@@ -116,7 +151,7 @@ export default function Profile() {
                   rows={3}
                 />
               ) : (
-                <p className="text-gray-700 dark:text-gray-300">{profileData.bio}</p>
+                <p className="text-gray-700 dark:text-gray-300">{editForm.bio}</p>
               )}
             </div>
 

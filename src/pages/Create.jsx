@@ -1,4 +1,5 @@
-import { useMemo, useState } from "react";
+/* eslint-disable react-hooks/set-state-in-effect */
+import { useMemo, useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import Container from "../components/Container.jsx";
 import Toast from "../components/Toast.jsx";
@@ -10,6 +11,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { Copy, Check, Sparkles, X, Lock } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { useSubscription } from "../hooks/useSubscription.js";
+import { useAuth } from "../hooks/useAuth.js";
 
 const categories = ["Crush", "Secret", "Funny", "Apology", "Anniversary"];
 
@@ -21,8 +23,15 @@ export default function Create() {
   const { t, i18n } = useTranslation();
   const navigate = useNavigate();
   const { canUseTemplates } = useSubscription();
+  const { user } = useAuth();
   const [from, setFrom] = useState("Anonymous");
   const [to, setTo] = useState("Crush");
+
+  useEffect(() => {
+    if (user?.name) {
+      setFrom(user.name);
+    }
+  }, [user?.name]);
   const [category, setCategory] = useState("Crush");
   const [message, setMessage] = useState("");
   const [generated, setGenerated] = useState("");

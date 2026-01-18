@@ -1,20 +1,45 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import { Settings as SettingsIcon, User, Bell, Shield, Moon, Sun, Globe, Smartphone, HelpCircle, LogOut, ChevronRight, Volume2, Vibrate } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { useTheme } from "../hooks/useTheme";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
+import { useAuth } from "../hooks/useAuth";
 
 export default function Settings() {
   const { i18n } = useTranslation();
   const { theme, setTheme } = useTheme();
-  const [notifications, setNotifications] = useState(true);
-  const [soundEnabled, setSoundEnabled] = useState(true);
-  const [hapticEnabled, setHapticEnabled] = useState(true);
+  const { logout, loading, isAuthenticated } = useAuth();
+  const navigate = useNavigate();
+  // Load settings from localStorage or default to true
+  const [notifications, setNotifications] = useState(() => {
+    return localStorage.getItem("settings_notifications") !== "false";
+  });
+  const [soundEnabled, setSoundEnabled] = useState(() => {
+    return localStorage.getItem("settings_sound") !== "false";
+  });
+  const [hapticEnabled, setHapticEnabled] = useState(() => {
+    return localStorage.getItem("settings_haptic") !== "false";
+  });
+
+  // Save settings when changed
+  useEffect(() => {
+    localStorage.setItem("settings_notifications", notifications);
+    localStorage.setItem("settings_sound", soundEnabled);
+    localStorage.setItem("settings_haptic", hapticEnabled);
+  }, [notifications, soundEnabled, hapticEnabled]);
+
+  useEffect(() => {
+    if (!loading && !isAuthenticated) {
+      navigate("/login");
+    }
+  }, [loading, isAuthenticated, navigate]);
+
+  if (loading) return null;
 
   const handleLogout = () => {
-    // Handle logout logic here
-    console.log("Logging out...");
+    logout();
+    navigate("/");
   };
 
   const settingsSections = [
@@ -31,20 +56,20 @@ export default function Settings() {
       title: "Preferences",
       icon: SettingsIcon,
       items: [
-        { 
-          label: "Theme", 
+        {
+          label: "Theme",
           action: "theme",
           description: "Choose your preferred theme",
           value: theme === "dark" ? "Dark" : "Light"
         },
-        { 
-          label: "Language", 
+        {
+          label: "Language",
           action: "language",
           description: "Select your preferred language",
           value: i18n.language === "km" ? "ខ្មែរ" : "English"
         },
-        { 
-          label: "Notifications", 
+        {
+          label: "Notifications",
           action: "notifications",
           description: "Manage notification preferences",
           value: notifications ? "On" : "Off"
@@ -55,14 +80,14 @@ export default function Settings() {
       title: "Accessibility",
       icon: Smartphone,
       items: [
-        { 
-          label: "Sound Effects", 
+        {
+          label: "Sound Effects",
           action: "sound",
           description: "Enable/disable sound effects",
           value: soundEnabled ? "On" : "Off"
         },
-        { 
-          label: "Haptic Feedback", 
+        {
+          label: "Haptic Feedback",
           action: "haptic",
           description: "Vibration feedback on mobile",
           value: hapticEnabled ? "On" : "Off"

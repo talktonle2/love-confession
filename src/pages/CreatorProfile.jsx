@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import Container from "../components/Container.jsx";
 import { useTranslation } from "react-i18next";
 import { motion } from "framer-motion";
-import { Coffee, Heart, Users, TrendingUp, Sparkles, FileText } from "lucide-react";
+import { Coffee, Heart, Users, TrendingUp, FileText } from "lucide-react";
 import { getCreatorCoffeeStats } from "../utils/coffee.js";
 import CoffeeButton from "../components/CoffeeButton.jsx";
 import ProjectRequestForm from "../components/ProjectRequestForm.jsx";
