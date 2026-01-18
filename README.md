@@ -5,6 +5,7 @@ A beautiful and interactive love confession application built with React, Tailwi
 ## Features
 
 - **Anonymous Confessions**: Submit confessions anonymously.
+- **Authentication**: Beautiful Login and Register pages.
 - **Rich Interaction**: Like and react to confessions (Heart, Wow, Laugh, Cry, Fire).
 - **Responsive Design**: Mobile-friendly UI with smooth animations.
 - **Social Sharing**: Share specific confessions via direct link or QR code.
